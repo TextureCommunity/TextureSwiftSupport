@@ -23,7 +23,7 @@ import Foundation
 
 import AsyncDisplayKit
 
-public final class ShapeRenderingNode: ASDisplayNode, ShapeDisplaying {
+public final class ShapeRenderingNode: NamedDisplayNodeBase, ShapeDisplaying {
     
   private struct Backing: Hashable {
     var shapeFillColor: UIColor? = .black

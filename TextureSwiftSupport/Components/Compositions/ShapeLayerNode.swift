@@ -32,11 +32,13 @@ fileprivate final class BackingShapeLayerNode : ASDisplayNode {
 }
 
 /// A node that displays shape with CAShapeLayer
-public final class ShapeLayerNode : ASDisplayNode, ShapeDisplaying {
+public final class ShapeLayerNode : NamedDisplayNodeBase, ShapeDisplaying {
   
   private let backingNode = BackingShapeLayerNode()
-
-  private let updateClosure: Update
+  
+  public typealias PrimitiveUpdate = (CAShapeLayer) -> Void
+  
+  private let updateClosure: PrimitiveUpdate
 
   public var usesInnerBorder: Bool = true {
     didSet {
@@ -99,7 +101,7 @@ public final class ShapeLayerNode : ASDisplayNode, ShapeDisplaying {
     defer {
       CATransaction.commit()
     }
-    backingNode.layer.path = updateClosure(backingNode.bounds).cgPath
+    updateClosure(backingNode.layer)
   }
   
   public override var frame: CGRect {
@@ -110,13 +112,21 @@ public final class ShapeLayerNode : ASDisplayNode, ShapeDisplaying {
         defer {
           CATransaction.commit()
         }
-        self.backingNode.layer.path = self.updateClosure(self.backingNode.bounds).cgPath
+        self.updateClosure(self.backingNode.layer)
       }
     }
   }
 
-  public init(
+  public convenience init(
     update: @escaping Update
+  ) {
+    self.init { (layer: CAShapeLayer) in
+      layer.path = update(layer.bounds).cgPath
+    }
+  }
+  
+  public init(
+    update: @escaping PrimitiveUpdate
   ) {
     self.updateClosure = update
     super.init()
