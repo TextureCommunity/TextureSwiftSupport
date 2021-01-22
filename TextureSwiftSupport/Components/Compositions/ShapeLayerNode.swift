@@ -36,7 +36,7 @@ public final class ShapeLayerNode : NamedDisplayNodeBase, ShapeDisplaying {
   
   private let backingNode = BackingShapeLayerNode()
   
-  public typealias PrimitiveUpdate = (CAShapeLayer) -> Void
+  public typealias PrimitiveUpdate = (ShapeLayerNode) -> Void
   
   private let updateClosure: PrimitiveUpdate
 
@@ -101,7 +101,7 @@ public final class ShapeLayerNode : NamedDisplayNodeBase, ShapeDisplaying {
     defer {
       CATransaction.commit()
     }
-    updateClosure(backingNode.layer)
+    updateClosure(self)
   }
   
   public override var frame: CGRect {
@@ -112,7 +112,7 @@ public final class ShapeLayerNode : NamedDisplayNodeBase, ShapeDisplaying {
         defer {
           CATransaction.commit()
         }
-        self.updateClosure(self.backingNode.layer)
+        self.updateClosure(self)
       }
     }
   }
@@ -120,8 +120,8 @@ public final class ShapeLayerNode : NamedDisplayNodeBase, ShapeDisplaying {
   public convenience init(
     update: @escaping Update
   ) {
-    self.init { (layer: CAShapeLayer) in
-      layer.path = update(layer.bounds).cgPath
+    self.init { (`self`: ShapeLayerNode) in
+      self.backingNode.layer.path = update(self.bounds).cgPath
     }
   }
   
